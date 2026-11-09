@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BHC.engineering | Bâtir l'Exception</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-dark': '#0F0F0F',
+                        'brand-light': '#F5F5F5',
+                        'brand-accent': '#FF4D00',
+                    },
+                    fontFamily: {
+                        heading: ['"Space Grotesk"', 'sans-serif'],
+                        body: ['"Inter"', 'sans-serif'],
+                    },
+                    backgroundImage: {
+                        'grid-pattern': "linear-gradient(to right, rgba(15, 15, 15, 0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(15, 15, 15, 0.05) 1px, transparent 1px)",
+                        'grid-pattern-dark': "linear-gradient(to right, rgba(245, 245, 245, 0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(245, 245, 245, 0.05) 1px, transparent 1px)",
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #F5F5F5;
+            color: #0F0F0F;
+            overflow-x: hidden;
+        }
+
+        /* Grille architecturale subtile */
+        .bg-blueprint {
+            background-image: linear-gradient(to right, rgba(15, 15, 15, 0.04) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(15, 15, 15, 0.04) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        .bg-blueprint-dark {
+            background-image: linear-gradient(to right, rgba(245, 245, 245, 0.04) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(245, 245, 245, 0.04) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        /* Animation de révélation (Stagger) */
+        .reveal-wrap { overflow: hidden; display: block; }
+        .reveal-text {
+            display: block;
+            transform: translateY(100%);
+            transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .is-active .reveal-text { transform: translateY(0); }
+
+        /* Animation simple fade-up */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .is-active.fade-up {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Délais pour l'effet cascade */
+        .delay-100 { transition-delay: 100ms; }
+        .delay-200 { transition-delay: 200ms; }
+        .delay-300 { transition-delay: 300ms; }
+        .delay-400 { transition-delay: 400ms; }
+
+        /* Filtre image Hero */
+        .hero-img {
+            filter: none;
+            mix-blend-mode: normal;
+            opacity: 1;
+        }
+
+        /* Projets Hover */
+        .project-card img {
+            transition: transform 0.6s ease;
+        }
+        .project-card:hover img {
+            transform: scale(1.03);
+        }
+
+        /* Input style */
+        .input-minimal {
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid rgba(15, 15, 15, 0.2);
+            padding: 1rem 0;
+            width: 100%;
+            transition: border-color 0.3s ease;
+        }
+        .input-minimal:focus {
+            outline: none;
+            border-bottom: 2px solid #FF4D00;
+        }
+    </style>
+</head>
+<body class="font-body antialiased bg-blueprint selection:bg-brand-accent selection:text-white">
+
+    <!-- NAVBAR -->
+    <nav class="fixed w-full z-50 top-0 border-b border-brand-dark/10 bg-brand-light/80 backdrop-blur-md transition-all duration-300" id="navbar">
+        <div class="max-w-screen-2xl mx-auto px-6 lg:px-12">
+            <div class="flex justify-between items-center h-24">
+                <!-- Logo -->
+                <a href="index.html" class="font-heading font-bold text-2xl tracking-tighter flex items-center gap-2">
+                    BHC<span class="text-brand-accent">.</span>engineering
+                </a>
+                
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex space-x-12 text-sm font-medium uppercase tracking-widest">
+                    <a href="index.html" class="text-brand-accent">Accueil</a>
+                    <a href="articles.html" class="hover:text-brand-accent transition-colors">Articles</a>
+                    <a href="postuler.html" class="hover:text-brand-accent transition-colors">Postuler</a>
+                    <a href="contact.html" class="hover:text-brand-accent transition-colors">Contact</a>
+                </div>
+
+                <div class="hidden md:block">
+                    <a href="contact.html" class="text-xs font-bold uppercase tracking-widest border border-brand-dark px-6 py-3 hover:bg-brand-dark hover:text-brand-light transition-all duration-300">
+                        Démarrer un projet
+                    </a>
+                </div>
+
+                <!-- Mobile Menu Btn -->
+                <button id="mobile-menu-btn" class="md:hidden focus:outline-none">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 8h16M4 16h16"></path></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-brand-light border-b border-brand-dark/10">
+            <div class="px-6 py-8 flex flex-col space-y-6 text-lg font-heading">
+                <a href="index.html" class="text-brand-accent">Accueil</a>
+                <a href="articles.html">Articles</a>
+                <a href="postuler.html">Postuler</a>
+                <a href="contact.html">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <header class="relative h-screen flex items-center pt-24 overflow-hidden bg-brand-dark bg-blueprint-dark text-brand-light">
+        <!-- Image de fond -->
+        <div class="absolute inset-0 z-0">
+            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop" alt="Architecture" class="w-full h-full object-cover hero-img">
+        </div>
+
+        <div class="max-w-screen-2xl mx-auto px-6 lg:px-12 relative z-10 w-full">
+            <div class="max-w-4xl">
+                <p class="text-brand-accent font-mono uppercase tracking-widest text-sm mb-6 reveal-wrap"><span class="reveal-text">Bureau d'études · Alger</span></p>
+                
+                <h1 class="font-heading text-6xl md:text-8xl lg:text-[9rem] font-bold leading-[0.9] tracking-tighter mb-8">
+                    <div class="reveal-wrap"><span class="reveal-text delay-100">BÂTIR</span></div>
+                    <div class="reveal-wrap"><span class="reveal-text delay-200">L'EXCEPTION<span class="text-brand-accent">.</span></span></div>
+                </h1>
+                
+                <div class="reveal-wrap mb-12">
+                    <p class="reveal-text delay-300 text-lg md:text-xl text-brand-light/70 max-w-2xl font-light leading-relaxed">
+                        Architecture, Urbanisme et Paysage. De la conception initiale à la réalisation finale, nous façonnons des espaces qui défient le temps.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ligne de côte -->
+        <div class="absolute bottom-0 w-full border-b border-brand-light/20"></div>
+    </header>
+
+    <!-- SERVICES SECTION -->
+    <section class="py-32 bg-brand-light relative">
+        <div class="max-w-screen-2xl mx-auto px-6 lg:px-12">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-20 reveal-wrap">
+                <div>
+                    <h2 class="reveal-text font-heading text-4xl md:text-6xl font-bold tracking-tighter">EXPERTISES<span class="text-brand-accent">.</span></h2>
+                </div>
+                <div class="hidden md:block text-right">
+                    <p class="text-sm font-mono uppercase tracking-widest text-brand-dark/50">Nos domaines de<br>compétences</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 border-t border-l border-brand-dark/10">
+                <!-- Service 1 -->
+                <div class="fade-up p-10 border-r border-b border-brand-dark/10 hover:bg-brand-dark hover:text-brand-light transition-colors duration-500 group cursor-pointer">
+                    <div class="mb-12">
+                        <svg class="w-12 h-12 text-brand-dark group-hover:text-brand-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                    </div>
+                    <span class="text-xs font-mono mb-2 block opacity-50">01 / ARCHITECTURE</span>
+                    <h3 class="font-heading text-2xl font-bold mb-4">Conception & Réalisation</h3>
+                    <p class="text-sm opacity-70 leading-relaxed">Plans détaillés, permis de construire, suivi de chantier et direction des travaux.</p>
+                </div>
+                <!-- Service 2 -->
+                <div class="fade-up delay-100 p-10 border-r border-b border-brand-dark/10 hover:bg-brand-dark hover:text-brand-light transition-colors duration-500 group cursor-pointer">
+                    <div class="mb-12">
+                        <svg class="w-12 h-12 text-brand-dark group-hover:text-brand-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <span class="text-xs font-mono mb-2 block opacity-50">02 / URBANISME</span>
+                    <h3 class="font-heading text-2xl font-bold mb-4">Planification Urbaine</h3>
+                    <p class="text-sm opacity-70 leading-relaxed">Aménagement d'espaces publics, intégration paysagère et études de faisabilité.</p>
+                </div>
+                <!-- Service 3 -->
+                <div class="fade-up delay-200 p-10 border-r border-b border-brand-dark/10 hover:bg-brand-dark hover:text-brand-light transition-colors duration-500 group cursor-pointer">
+                    <div class="mb-12">
+                        <svg class="w-12 h-12 text-brand-dark group-hover:text-brand-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+                    </div>
+                    <span class="text-xs font-mono mb-2 block opacity-50">03 / PAYSAGE</span>
+                    <h3 class="font-heading text-2xl font-bold mb-4">Design Extérieur</h3>
+                    <p class="text-sm opacity-70 leading-relaxed">Création de jardins, terrasses et espaces extérieurs en harmonie avec le bâti.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PROJETS SECTION (Dynamique) -->
+    <section class="py-32 bg-brand-light relative border-t border-brand-dark/10">
+        <div class="max-w-screen-2xl mx-auto px-6 lg:px-12">
+            <div class="mb-16 reveal-wrap">
+                <h2 class="reveal-text font-heading text-4xl md:text-6xl font-bold tracking-tighter">RÉALISATIONS<span class="text-brand-accent">.</span></h2>
+            </div>
+
+            <!-- Grille Asymétrique -->
+            <div id="projects-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[300px]">
+                <!-- Les projets seront injectés ici par JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACT SECTION -->
+    <section class="py-32 bg-brand-dark text-brand-light bg-blueprint-dark relative">
+        <div class="max-w-screen-2xl mx-auto px-6 lg:px-12 relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-20">
+                
+                <!-- Texte Gauche -->
+                <div class="reveal-wrap">
+                    <h2 class="reveal-text font-heading text-5xl md:text-7xl font-bold leading-none tracking-tighter mb-8">
+                        DISCUTONS<br>DE VOTRE<br><span class="text-brand-accent">PROJET.</span>
+                    </h2>
+                    <p class="text-brand-light/60 text-lg max-w-md mt-8 font-light">
+                        Une idée, un terrain, un cahier des charges ? Notre équipe est prête à relever le défi.
+                    </p>
+                </div>
+
+                <!-- Formulaire Minimaliste -->
+                <div class="fade-up delay-200">
+                    <form class="space-y-8">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div>
+                                <label class="block text-xs font-mono uppercase tracking-widest text-brand-light/50 mb-2">Nom complet</label>
+                                <input type="text" class="input-minimal text-brand-light placeholder-brand-light/20 focus:border-brand-accent" placeholder="Votre nom">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-mono uppercase tracking-widest text-brand-light/50 mb-2">Email</label>
+                                <input type="email" class="input-minimal text-brand-light placeholder-brand-light/20 focus:border-brand-accent" placeholder="votre@email.com">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-mono uppercase tracking-widest text-brand-light/50 mb-2">Type de projet</label>
+                            <input type="text" class="input-minimal text-brand-light placeholder-brand-light/20 focus:border-brand-accent" placeholder="Ex: Villa, Immeuble, Aménagement intérieur...">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-mono uppercase tracking-widest text-brand-light/50 mb-2">Message</label>
+                            <textarea rows="3" class="input-minimal text-brand-light placeholder-brand-light/20 focus:border-brand-accent resize-none" placeholder="Décrivez brièvement votre projet..."></textarea>
+                        </div>
+                        
+                        <button type="button" class="w-full bg-brand-accent text-brand-dark font-bold uppercase tracking-widest text-sm py-5 hover:bg-brand-light transition-colors duration-300">
+                            Envoyer la demande
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-brand-dark text-brand-light py-12 border-t border-brand-light/10">
+        <div class="max-w-screen-2xl mx-auto px-6 lg:px-12 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="font-heading font-bold text-2xl tracking-tighter">
+                BHC<span class="text-brand-accent">.</span>engineering
+            </div>
+            <div class="flex space-x-8 text-xs font-mono uppercase tracking-widest text-brand-light/50">
+                <a href="#" class="hover:text-brand-accent transition-colors">Mentions Légales</a>
+                <a href="#" class="hover:text-brand-accent transition-colors">Confidentialité</a>
+            </div>
+            <p class="text-xs font-mono text-brand-light/30">&copy; 2024 BHC.engineering.</p>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // 1. Menu Mobile
+            const btn = document.getElementById('mobile-menu-btn');
+            const menu = document.getElementById('mobile-menu');
+            btn.addEventListener('click', () => {
+                menu.classList.toggle('hidden');
+            });
+
+            // 2. Navbar Scroll Effect
+            const navbar = document.getElementById('navbar');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('bg-brand-light/95', 'shadow-sm');
+                    navbar.classList.remove('bg-brand-light/80');
+                } else {
+                    navbar.classList.remove('bg-brand-light/95', 'shadow-sm');
+                    navbar.classList.add('bg-brand-light/80');
+                }
+            });
+
+            // 3. Données Projets (Générées dynamiquement)
+            const projects = [
+                {
+                    title: "Aménagement Appartement Hydra",
+                    category: "Design Intérieur",
+                    img: "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?q=80&w=2070&auto=format&fit=crop",
+                    classes: "md:col-span-2 md:row-span-2" // Grande carte
+                },
+                {
+                    title: "Villa Contemporaine El Harrach",
+                    category: "Architecture",
+                    img: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=2075&auto=format&fit=crop",
+                    classes: "md:col-span-1 md:row-span-1" // Petite carte
+                },
+                {
+                    title: "Buanderie Sur Mesure",
+                    category: "Design Intérieur",
+                    img: "https://images.unsplash.com/photo-1620626011761-996317b8d101?q=80&w=2069&auto=format&fit=crop",
+                    classes: "md:col-span-1 md:row-span-1" // Petite carte
+                },
+                {
+                    title: "Salle de Bain Minimaliste",
+                    category: "Design Intérieur",
+                    img: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=2070&auto=format&fit=crop",
+                    classes: "md:col-span-2 md:row-span-1" // Large carte
+                },
+                {
+                    title: "Espaces Verts & Paysage",
+                    category: "Urbanisme",
+                    img: "https://images.unsplash.com/photo-1558904541-efa843a96f0f?q=80&w=2070&auto=format&fit=crop",
+                    classes: "md:col-span-1 md:row-span-1" // Petite carte
+                }
+            ];
+
+            const grid = document.getElementById('projects-grid');
+
+            projects.forEach((project) => {
+                const card = document.createElement('a');
+                card.href = "#"; // À remplacer par le lien de l'étude de cas
+                card.className = `project-card fade-up relative overflow-hidden bg-brand-dark/5 group block ${project.classes}`;
+                
+                card.innerHTML = `
+                    <img src="${project.img}" alt="${project.title}" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-brand-dark/90 via-brand-dark/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-8">
+                        <span class="text-brand-accent text-xs font-mono uppercase tracking-widest mb-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">${project.category}</span>
+                        <h3 class="text-brand-light font-heading text-2xl font-bold transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 delay-75">${project.title}</h3>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            // 4. IntersectionObserver pour les animations (Stagger & Fade)
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.15
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-active');
+                        observer.unobserve(entry.target); // Ne plus observer une fois animé
+                    }
+                });
+            }, observerOptions);
+
+            // Observer les wrappers de texte pour l'effet de masque
+            document.querySelectorAll('.reveal-wrap').forEach(el => {
+                observer.observe(el);
+            });
+
+            // Observer les éléments pour l'effet fade-up
+            document.querySelectorAll('.fade-up').forEach(el => {
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>
